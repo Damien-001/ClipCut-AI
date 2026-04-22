@@ -6,6 +6,8 @@ import multer from "multer";
 import ffmpeg from "fluent-ffmpeg";
 import archiver from "archiver";
 import { fileURLToPath } from 'url';
+import ffmpegStatic from "ffmpeg-static";
+import ffprobeStatic from "ffprobe-static";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,6 +15,10 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Set FFmpeg and FFprobe paths from static packages
+  if (ffmpegStatic) ffmpeg.setFfmpegPath(ffmpegStatic);
+  ffmpeg.setFfprobePath(ffprobeStatic.path);
 
   // Ensure directories exist
   const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -149,6 +155,24 @@ async function startServer() {
     }
     
     res.download(filePath, clipName);
+  });
+
+  // API Route: Delete job files and uploaded video
+  app.delete("/api/cleanup", async (req, res) => {
+    const { jobId, filename } = req.body;
+    try {
+      if (jobId) {
+        const jobDir = path.join(outputsDir, jobId);
+        if (fs.existsSync(jobDir)) await fs.remove(jobDir);
+      }
+      if (filename) {
+        const uploadedFile = path.join(uploadsDir, filename);
+        if (fs.existsSync(uploadedFile)) await fs.remove(uploadedFile);
+      }
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Erreur lors de la suppression" });
+    }
   });
 
   // API Route: Download all files as ZIP

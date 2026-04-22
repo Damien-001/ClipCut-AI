@@ -120,6 +120,30 @@ export default function App() {
     }
   };
 
+  const handleReset = async () => {
+    // Clean up server files
+    if (result || uploadedRef) {
+      try {
+        await fetch("/api/cleanup", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobId: result?.jobId,
+            filename: uploadedRef?.filename
+          })
+        });
+      } catch (_) {
+        // ignore cleanup errors
+      }
+    }
+    setFile(null);
+    setUploadedRef(null);
+    setResult(null);
+    setUploadProgress(0);
+    setError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const formatSize = (bytes: number) => {
     if (bytes === 0) return "0 B";
     const k = 1024;
@@ -348,14 +372,24 @@ export default function App() {
                     <span className="w-6 h-px bg-neutral-200 mr-3"></span>
                     Clips Générés ({result.count})
                   </h2>
-                  <a 
-                    id="btn-download-all"
-                    href={`/api/download-all/${result.jobId}`}
-                    className="flex items-center justify-center gap-2 text-sm font-bold bg-neutral-900 text-white px-6 py-3 rounded-2xl hover:bg-black transition-colors shadow-lg active:scale-95"
-                  >
-                    <Download className="w-4 h-4" />
-                    Tout télécharger (ZIP)
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <button
+                      id="btn-new-video"
+                      onClick={handleReset}
+                      className="flex items-center justify-center gap-2 text-sm font-bold border-2 border-neutral-900 text-neutral-900 px-5 py-3 rounded-2xl hover:bg-neutral-900 hover:text-white transition-all active:scale-95"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Nouvelle vidéo
+                    </button>
+                    <a 
+                      id="btn-download-all"
+                      href={`/api/download-all/${result.jobId}`}
+                      className="flex items-center justify-center gap-2 text-sm font-bold bg-neutral-900 text-white px-6 py-3 rounded-2xl hover:bg-black transition-colors shadow-lg active:scale-95"
+                    >
+                      <Download className="w-4 h-4" />
+                      Tout télécharger (ZIP)
+                    </a>
+                  </div>
                 </div>
 
                 <div className="grid gap-3" id="clips-list">
@@ -383,21 +417,6 @@ export default function App() {
                       </a>
                     </motion.div>
                   ))}
-                </div>
-
-                <div className="mt-12 flex justify-center">
-                  <button 
-                    id="btn-reset"
-                    onClick={() => {
-                      setFile(null);
-                      setUploadedRef(null);
-                      setResult(null);
-                      setUploadProgress(0);
-                    }}
-                    className="text-neutral-400 hover:text-neutral-900 text-xs font-bold transition-colors uppercase tracking-widest"
-                  >
-                    Découper une nouvelle vidéo
-                  </button>
                 </div>
               </motion.section>
             )}
