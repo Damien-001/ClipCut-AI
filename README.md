@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ClipCut AI
 
-# Run and deploy your AI Studio app
+Divisez vos vidéos en segments parfaits pour vos réseaux sociaux en un clic.
 
-This contains everything you need to run your app locally.
+## Prérequis
 
-View your app in AI Studio: https://ai.studio/apps/ab738e9f-fdf2-48b5-a7f5-d57e60abe5b3
+- Node.js
 
-## Run Locally
+## Installation
 
-**Prerequisites:**  Node.js
+```bash
+npm install
+```
 
+## Lancer le projet
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```bash
+npm run dev
+```
+
+L'application sera disponible sur [http://localhost:3000](http://localhost:3000).
+
+## Fonctionnalités
+
+- Upload de vidéos MP4, MOV, AVI (max 500 Mo)
+- Découpage automatique en clips de durée configurable
+- Téléchargement individuel ou en ZIP
+- Nettoyage automatique des fichiers après reset
+
+## Stack
+
+- React + TypeScript + Vite
+- Express + FFmpeg (via ffmpeg-static)
+- Tailwind CSS
